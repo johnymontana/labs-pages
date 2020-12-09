@@ -9,6 +9,7 @@ nav:
 - modules/grandstack-graphql/nav.adoc
 # - modules/graph-algorithms/nav.adoc
 - modules/halin/nav.adoc
+- modules/howto/nav.adoc
 - modules/neo4j-helm/nav.adoc
 - modules/neosemantics/nav.adoc
 - modules/kafka/nav.adoc
