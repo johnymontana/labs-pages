@@ -1,0 +1,69 @@
+= Using Neo4j With Cloudflare Workers
+:docs: https://moxious.github.io/halin
+:slug: gatsby
+:author: William Lyon
+:category: labs
+:tags: graphql, javascript, web
+:neo4j-versions: 3.5, 4.0, 4.1, 4.2
+
+Gatsby.js is a static site generator that uses React and GraphQL to create web pages.
+
+
+== What Is Gatsby.js?
+
+== Why Use Gatsby With Neo4j?
+
+== Architecture Overview
+
+image::gatsby.png[]
+
+There are two ways to use GraphQL with Neo4j and Gatsby:
+
+1. As a source for static content during Gatsby's build process
+2. By querying the Neo4j GraphQL API from the client application.
+
+== How To
+
+=== Libraries / Packages 
+
+* `neo4j-graphql-js`
+* `gatsby-source-graphql`
+
+=== Sample Code
+
+In this example we will create a GraphQL API exposing data in Neo4j. We will use the Neo4j Sandbox OpenStreetMap dataset.
+
+Configure the `gatsby-source-graphql` plugin.
+
+[source,js]
+----
+plugins: [
+    {
+        resolve: `gatsby-source-graphql`,
+        options: {
+            typeName: `PointOfInterest`,
+            fieldName: `poi`,
+            url: `http://localhost:3003`
+        }
+    },
+... ]
+----
+
+== Resources
+
+// * link:https://grandstack.io[Neo4j GraphQL documentation]
+// * link:https://github.com/johnymontana/central-perk[Gatsby.js / Neo4j GraphQL travel guide demo app]
+
+[cols="1,4"]
+|===
+// | icon:comments[] Support | https://community.neo4j.com/c/drivers-stacks/graphql-grandstack[Neo4j Online Community]
+// | icon:user[] Authors | William Lyon, Michael Graham
+| icon:book[] Neo4j GraphQL documentation | https://grandstack.io
+// | icon:gift[] Releases | https://github.com/neo4j-graphql/neo4j-graphql-js/releases
+| icon:github[] Gatsby.js / Neo4j GraphQL travel guide demo app | https://github.com/neo4j-graphql/neo4j-graphql-js
+// | icon:book[] Docs | https://grandstack.io/docs
+// | icon:book[] Article |
+// | icon:play-circle[] Example | https://grandstack.io/docs/getting-started-grand-stack-starter.html[The GRANDstack starter]
+// | icon:rss[] Blog | https://blog.grandstack.io
+|===
+
