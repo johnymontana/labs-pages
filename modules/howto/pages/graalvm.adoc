@@ -1,0 +1,149 @@
+= Using Neo4j With GraalVM
+:docs: 
+:slug: graalvm
+:author: Jennifer Reif
+:category: labs
+:tags: jvm, polyglot, programming, drivers
+:neo4j-versions: 3.5, 4.0, 4.1, 4.2
+
+GraalVM is a runtime that seeks to improve application performance and efficiency, as well as offer a shared runtime for different programming languages to interact with each other.
+
+== What Is GraalVM?
+
+It is a Java Virtual Machine (JVM) and Java Development Kit (JDK) bundled together to decrease the footprint and startup time of an application. GraalVM includes a just-in-time (JIT) compiler, native image, Truffle language implementation framework, and built-in tools. Each of these provisions is explained in a bit more detail below.
+
+* JIT compiler: written in Java and intended to be more modular and flexible than previous compilers. Can run alongside existing compilers, as well as run instead of others.
+* https://www.graalvm.org/reference-manual/native-image/[GraalVM native image^]: ahead-of-time (AOT) compiler for JVM-based languages or those implemented in Truffle. Compiles these to executable binaries with the goal of minimal application startup time and application file size.
+* https://www.graalvm.org/graalvm-as-a-platform/language-implementation-framework/[Truffle Language Implementation Framework^]: for implementing additional languages on GraalVM. Current implementations include Javascript, Python, Ruby, R, and LLVM. Other language interpreters can be added by using Truffle as the foundation framework.
+* https://www.graalvm.org/docs/tools/[Out-of-the-box tools^]: for monitoring, debugging, and development. GraalVM contains language-agnostic tools like backend and Chrome debuggers, dashboards, profiling, code coverage, VSCode extensions, and language protocols.
+
+== Why Use GraalVM With Neo4j?
+
+There are a few different reasons why developers might choose GraalVM over other JVM options.
+
+1. To access Neo4j from outside languages using an official driver (like the Java driver). This allows you to use the Java libraries for connecting to Neo4j from languages like Python, Ruby, R, Javascript, LLVM, as well as other language implementations built with Truffle.
+
+2. To write programs in various languages and bring in non-Java libraries to use with it.
+For instance, you could pull in Python's `ratelimit` library or Javascript's `colors` into any other language for a program interacting with Neo4j.
+
+3. To extend Neo4j or the Cypher query language by writing procedures and functions in any language and packaging them as a database plugin for Neo4j.
+
+4. To use Cypher as the query language in various programs (with Cypher Truffle implementation). This would allow you to embed Cypher code in your Python or Javascript program for executing against Neo4j.
+
+== Architecture Overview
+
+image::graalvm.png[]
+
+Currently, there are two ways to use GraalVM with Neo4j:
+
+1. Connect to and interact with Neo4j (using the official Java driver) from non-JVM languages - Python, Ruby, R, and Javascript.
+2. Execute code in Python, Ruby, R, and Javascript like a Cypher procedure (deployed in a Neo4j plugin).
+
+== How To
+
+=== Libraries / Packages 
+
+* `graalvm/graalvm-ce-builds` - https://github.com/graalvm/graalvm-ce-builds/releases[releases for download^]
+
+Others needed:
+
+1. Connect to Neo4j from non-JVM languages:
+* `neo4j-java-driver` - https://neo4j.com/download-center/#drivers[Neo4j Drivers download page^]
+* `reactive-streams` - dependency of Java driver above (https://neo4j.com/docs/java-manual/4.2/get-started/#java-driver-get-started-installation[Java driver manual, dependencies^])
+
+2. Execute custom procedures/functions:
+* `neo4j` - https://neo4j.com/download-center/#community[download Neo4j community server^]
+
+=== Sample Code #1
+
+In this example, we will connect to Neo4j from Python with the Java driver, query the database, and return results.
+
+[source,python]
+----
+import java
+
+# Adds Java libraries to GraalVM from Python
+java.add_to_classpath("target/lib/reactive-streams-1.0.3.jar")
+java.add_to_classpath("target/lib/neo4j-java-driver-4.0.3.jar")
+
+# Brings in required classes
+graphDatabase = java.type('org.neo4j.driver.GraphDatabase')
+authTokens = java.type('org.neo4j.driver.AuthTokens')
+config = java.type('org.neo4j.driver.Config')
+sessionConfig = java.type('org.neo4j.driver.SessionConfig')
+
+# Call to static factory method named `driver`
+driver = graphDatabase.driver(
+    'bolt://localhost:7687',
+    authTokens.basic('neo4j', 'Testing123'),
+    config.builder()
+        .withMaxConnectionPoolSize(1) # Don't need a bigger pool size for a script
+        .build()
+)
+
+# Python dicts not automatically converted to Java maps, so use Neo4j's Values to build parameters
+values = java.type('org.neo4j.driver.Values')
+
+def findConnections(driver):
+    #query the database and format the records
+
+results = findConnections(driver)
+
+for name in results:
+    print(name)
+
+driver.close()
+----
+
+=== Sample Code #2
+
+In this example, we will write a custom procedure that we can call with Cypher.
+
+[source,java]
+----
+//import statements
+
+public class PolyglotUtil {
+    //context and logs defined
+
+    @Procedure(value = "polyglot.run")
+    @Description("polyglot.run(language, code) - Executes the code given. Throws things otherwise.")
+    public Stream<Output> execute(@Name("language") String language, @Name("code") String code) throws IOException {
+        try (var context = org.graalvm.polyglot.Context.newBuilder().allowAllAccess(true).build()) {
+            var bindings = context.getPolyglotBindings();
+            bindings.putMember("db", db);
+
+            Value v = context.eval(language, code);
+            log.info("Check value equals " + v);
+
+            Object result = convert(v);
+
+            return Stream.of(new Output(result));
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            throw exc;
+        }
+    }
+}
+----
+
+Then we can call this procedure from Cypher shell or Neo4j Browser as shown below.
+
+[source,cypher]
+----
+CALL polyglot.run(
+    'python',
+    'import math; totalEntities = 3000; callsNeeded = int(math.ceil(totalEntities / 100)); callsNeeded'
+);
+----
+
+== Resources
+
+[cols="1,4"]
+|===
+| icon:github[] GraalVM / Neo4j connection from multi-language | https://github.com/JMHReif/neo4j-graalvm
+| icon:github[] GraalVM / Neo4j extension | https://github.com/JMHReif/neo4j-graalvm-polyglot
+| icon:book[] Docs | https://www.graalvm.org/docs/introduction/
+// | icon:book[] Article |
+| icon:comments[] Questions/Feedback/Requests | https://community.neo4j.com/c/drivers-stacks/graphql-grandstack[Neo4j Online Community]
+|===
