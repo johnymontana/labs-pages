@@ -141,9 +141,9 @@ CALL polyglot.run(
 
 [cols="1,4"]
 |===
-| icon:github[] GraalVM / Neo4j connection from multi-language | https://github.com/JMHReif/neo4j-graalvm
-| icon:github[] GraalVM / Neo4j extension | https://github.com/JMHReif/neo4j-graalvm-polyglot
+| icon:github[] Connect to Neo4j from GraalVM | https://github.com/JMHReif/neo4j-graalvm
+| icon:github[] Extend Neo4j with GraalVM | https://github.com/JMHReif/neo4j-graalvm-polyglot
 | icon:book[] Docs | https://www.graalvm.org/docs/introduction/
 // | icon:book[] Article |
-| icon:comments[] Questions/Feedback/Requests | https://community.neo4j.com/c/drivers-stacks/graphql-grandstack[Neo4j Online Community]
+| icon:comments[] Feedback, Questions, & Requests | https://community.neo4j.com/[Neo4j Online Community]
 |===

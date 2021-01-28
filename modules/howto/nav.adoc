@@ -2,4 +2,5 @@
 *** xref:gatsby.adoc[Gatsby.js]
 *** xref:cloudflareworkers.adoc[Cloudflare Workers]
 *** xref:react.adoc[React]
+*** xref:graalvm.adoc[GraalVM]
 // *** xref:how-to-guide.adoc[How To Guide]

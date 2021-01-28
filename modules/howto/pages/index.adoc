@@ -12,3 +12,4 @@ This section provides an opinionated look at using Neo4j with various technologi
 * React
 * Cloudflare Workers
 * Gatsby
+* GraalVM
