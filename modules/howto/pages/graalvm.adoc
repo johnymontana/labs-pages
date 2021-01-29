@@ -32,7 +32,7 @@ For instance, you could pull in Python's `ratelimit` library or Javascript's `co
 
 == Architecture Overview
 
-image::graalvm.png[]
+image::graalvm_neo4j.png[]
 
 Currently, there are two ways to use GraalVM with Neo4j:
 
@@ -141,8 +141,8 @@ CALL polyglot.run(
 
 [cols="1,4"]
 |===
-| icon:github[] Connect to Neo4j from GraalVM | https://github.com/JMHReif/neo4j-graalvm
-| icon:github[] Extend Neo4j with GraalVM | https://github.com/JMHReif/neo4j-graalvm-polyglot
+| icon:github[] Connect to Neo4j from GraalVM | https://github.com/neo4j-labs/neo4j-graalvm
+| icon:github[] Extend Neo4j with GraalVM | https://github.com/neo4j-labs/neo4j-graalvm-polyglot
 | icon:book[] Docs | https://www.graalvm.org/docs/introduction/
 // | icon:book[] Article |
 | icon:comments[] Feedback, Questions, & Requests | https://community.neo4j.com/[Neo4j Online Community]
