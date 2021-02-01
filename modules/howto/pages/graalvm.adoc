@@ -138,6 +138,7 @@ for title in results:
 driver.close()
 ----
 
+[start=4]
 4. Save and close the program, then run it using the command below.
 
 [source,shell]
