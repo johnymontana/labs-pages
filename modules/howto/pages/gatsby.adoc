@@ -1,5 +1,4 @@
 = Using Neo4j With Gatsby.js
-:docs: https://moxious.github.io/halin
 :slug: gatsby
 :author: William Lyon
 :category: labs
@@ -34,15 +33,31 @@ In this example, we will use Gatsby and Neo4j to build a travel guide web applic
 
 * `neo4j-graphql-js`
 * `gatsby-source-graphql`
+* ``
 
 === Sample Code
 
-In this example we will create a GraphQL API exposing data in Neo4j. We will use the Neo4j Sandbox OpenStreetMap dataset.
+We will cover two ways of using Neo4j with Gatsby.js in this example. First, fetching data from Neo4j via a GraphQL API during the Gatsby build process. Next, we see how to use Neo4j to find routes between points of interest using client runtime data fetching queries.
 
-Configure the `gatsby-source-graphql` plugin.
+This example uses the OpenStreetMap Neo4j Sandbox dataset and a GraphQL API exposing this data. We will not cover the process to create the GraphQL API as there are link:https://neo4j.com/developer/graphql/[other resources that cover using GraphQL with Neo4j], but the code for the GraphQL API can be found link:https://github.com/johnymontana/central-perk/tree/master/neo4j-graphql[on Github.]
+
+==== Using Neo4j In The Gatsby Build Process
+
+The Gatsby build process uses a GraphQL API as a content source for fetching data to be included in pre-rendered pages. We will use the link:https://www.gatsbyjs.com/plugins/gatsby-source-graphql/[`gatsby-source-graphql` plugin] to connect the Neo4j GraphQL to Gatsby's GraphQL API. Our "remote" schema will be stitched into the Gatsby GraphQL API and can be queried using Gatsby static or page queries during the build process.
+
+Assuming you have already created a Gatsby project, install the `gatsby-source-graphql` plugin:
+
+[source,shell]
+----
+npm install gatsby-source-graphql
+----
+
+Next, configure the `gatsby-source-graphql` plugin in `gatsby-config.js`, by specifying the url for the Neo4j GraphQL API, declaring an arbitrary type name that will wrap the remote schema Query type (`typeName`), and specifying a field under which the remote schema will be available in the Gatsby GraphQL API.
 
 [source,js]
 ----
+// gatsby-config.js
+
 plugins: [
     {
         resolve: `gatsby-source-graphql`,
@@ -54,6 +69,134 @@ plugins: [
     },
 ... ]
 ----
+
+After restarting the Gatsby server the remote GraphQL schema exposing data in Neo4j will be available to query in the Gatsby GraphQL API under the `poi` Query field and can be queried in Gatsby components using static or page queries. For example, here we query for the details for an individual point of interest to render the page for that point of interest.
+
+[source,js]
+----
+// blog-post.js
+
+const BlogPostTemplate = ({ data, pageContext, location }) => {
+  const post = data.poi.PointOfInterest[0]
+  const siteTitle = data.site.siteMetadata.title
+  const { previous, next } = pageContext
+
+
+  return (
+    <Layout location={location} title={siteTitle}>
+      <SEO title={post.name} description={post.type} />
+      <article>
+        <header>
+          <h1
+            style={{
+              marginTop: rhythm(1),
+              marginBottom: 0,
+            }}
+          >
+            {post.name}
+          </h1>
+          <img src={post.photos[0]} alt={`Photo of ${post.name}`} />
+          <p
+            style={{
+              ...scale(-1 / 5),
+              display: `block`,
+              marginBottom: rhythm(1),
+            }}
+          >
+            {post.node_osm_id}
+          </p>
+        </header>
+        <p>
+          <ul>
+            {post.tags?.map((t, i) => {
+              return (
+                <li key={i}>
+                  <strong>{t.key}</strong>: {t.value}
+                </li>
+              )
+            })}
+          </ul>
+        </p>
+        <div dangerouslySetInnerHTML={{ __html: post.wikipedia }} />
+        <hr
+          style={{
+            marginBottom: rhythm(1),
+          }}
+        />
+        <footer>
+          <Bio />
+        </footer>
+      </article>
+
+      <nav>
+        <ul
+          style={{
+            display: `flex`,
+            flexWrap: `wrap`,
+            justifyContent: `space-between`,
+            listStyle: `none`,
+            padding: 0,
+          }}
+        >
+          <li>
+            {previous && (
+              <Link to={`/` + previous.node_osm_id} rel="prev">
+                ← {previous.name}
+              </Link>
+            )}
+          </li>
+          <li>
+            {next && (
+              <Link to={`/` + next.node_osm_id} rel="next">
+                {next.name} →
+              </Link>
+            )}
+          </li>
+        </ul>
+      </nav>
+    </Layout>
+  )
+}
+
+export default BlogPostTemplate
+
+export const pageQuery = graphql`
+  query POIBySlug($slug: ID!) {
+    site {
+      siteMetadata {
+        title
+      }
+    }
+    allPOIs: poi {
+      PointOfInterest(orderBy: name_asc) {
+        name
+        node_osm_id
+      }
+    }
+    poi {
+      PointOfInterest(node_osm_id: $slug) {
+        name
+        node_osm_id
+        photos(first: 1)
+        wikipedia
+        location {
+          latitude
+          longitude
+        }
+        tags {
+          key
+          value
+        }
+        type
+      }
+    }
+  }
+`
+----
+
+==== Client Runtime Data Fetching
+
+Another way to use Gatsby.js with Neo4j is by querying Neo4j at runtime instead of build time. This can be done using the JavaScript Neo4j driver or the useNeo4j React hook
 
 == Resources
 
@@ -79,37 +222,37 @@ plugins: [
 
 This six part video tutorial goes through the steps of building a travel guide web application taking advantage of both static page rendering with Gatsby.js and client runtime datafetching.
 
-Part 1: Getting Started with Neo4j, Gatsby, and GraphQL
+==== Part 1: Getting Started with Neo4j, Gatsby, and GraphQL
 
 ++++
 <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/siPmZRTRki8' frameborder='0' allowfullscreen></iframe></div>
 ++++
 
-Part 2: Using GraphQL With Gatsby.js
+==== Part 2: Using GraphQL With Gatsby.js
 
 ++++
 <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/XCuknJAIX84' frameborder='0' allowfullscreen></iframe></div>
 ++++
 
-Part 3: Images & Wikipedia Data With GraphQL
+==== Part 3: Images & Wikipedia Data With GraphQL
 
 ++++
 <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/_DBVYEgr73E' frameborder='0' allowfullscreen></iframe></div>
 ++++
 
-Part 4: Routing With Graph Algorithms
+==== Part 4: Routing With Graph Algorithms
 
 ++++
 <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/MvjhSDsai9U' frameborder='0' allowfullscreen></iframe></div>
 ++++
 
-Part 5: DigitalOcean App Platform Deployment
+==== Part 5: DigitalOcean App Platform Deployment
 
 ++++
 <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/SIDwj4mfbVQ' frameborder='0' allowfullscreen></iframe></div>
 ++++
 
-Part 6: Maps & Routes With Mapbox GL JS
+===== Part 6: Maps & Routes With Mapbox GL JS
 
 ++++
 <style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/6eRzgpMOG9A' frameborder='0' allowfullscreen></iframe></div>
