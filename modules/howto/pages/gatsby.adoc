@@ -31,9 +31,11 @@ In this example, we will use Gatsby and Neo4j to build a travel guide web applic
 
 === Libraries / Packages 
 
-* `neo4j-graphql-js`
-* `gatsby-source-graphql`
-* ``
+The following libraries and packages are useful when using Neo4j and Gatsby.js together:
+
+* link:https://grandstack.io/docs/neo4j-graphql-js[`neo4j-graphql-js`] - A package for building GraphQL APIs backed by Neo4j. GraphQL then becomes the integration point for Neo4j and Gatsby.
+* link:https://www.gatsbyjs.com/plugins/gatsby-source-graphql/[`gatsby-source-graphql`] - A Gatsby plugin for stitching remote GraphQL schemas into the Gatsby GraphQL API.
+* link:https://www.gatsbyjs.com/plugins/gatsby-plugin-apollo/[`gatsby-plugin-apollo`] - A Gatsby plugin to enable using Apollo Client for making client runtime GraphQL queries.
 
 === Sample Code
 
@@ -49,7 +51,7 @@ Assuming you have already created a Gatsby project, install the `gatsby-source-g
 
 [source,shell]
 ----
-npm install gatsby-source-graphql
+$ npm install gatsby-source-graphql
 ----
 
 Next, configure the `gatsby-source-graphql` plugin in `gatsby-config.js`, by specifying the url for the Neo4j GraphQL API, declaring an arbitrary type name that will wrap the remote schema Query type (`typeName`), and specifying a field under which the remote schema will be available in the Gatsby GraphQL API.
@@ -194,9 +196,193 @@ export const pageQuery = graphql`
 `
 ----
 
+By exporting a `pageQuery` GraphQL query Gatsby will execute this query at build time when rendering using this template. The results of this GraphQL query will then be passed to the React component in the `data` prop and the data can be used to render the page.
+
 ==== Client Runtime Data Fetching
 
-Another way to use Gatsby.js with Neo4j is by querying Neo4j at runtime instead of build time. This can be done using the JavaScript Neo4j driver or the useNeo4j React hook
+Another way to use Gatsby.js with Neo4j is by querying Neo4j at runtime instead of build time. This can be done using the JavaScript Neo4j driver, the useNeo4j React hook, or via GraphQL. In this example we will configure the `gatsby-plugin-apollo` plugin and make use of the GraphQL client Apollo Client to execute GraphQL queries at run time.
+
+First, install Apollo Client and the `gatsby-plugin-apollo` packages.
+
+[source,shell]
+----
+$ npm install gatsby-plugin-apollo @apollo/client
+----
+
+Next, configure the `gatsby-plugin-apollo` in `gatsby-config.js` by specifying the uri of the GraphQL endpoint.
+
+[source,js]
+----
+// gatsby-config.js
+module.exports = {
+  plugins: [
+    {
+      resolve: 'gatsby-plugin-apollo',
+      options: {
+        uri: 'http://localhost:3003'
+      }
+    }
+  ]
+};
+----
+
+An Apollo Client instance will be instantiated and injected into the React component hierarchy, making Apollo Client available in any React component in the Gatsby site.
+
+Here we update the component for rendering point of interest detail information to include a map and route the user to their next selected point of interest. The route details are queried at runtime when the user selects a destination and are calculated using Neo4j's graph algorithm functionality (in this case the A* algorithm from the Graph Data Science library).
+
+[source,js]
+----
+import { useLazyQuery, gql } from "@apollo/client"
+
+const GET_ROUTE_QUERY = gql`
+  query getRoute($from: ID!, $to: ID!) {
+    PointOfInterest(node_osm_id: $from) {
+      routeToPOI(poi: $to) {
+        latitude
+        longitude
+      }
+    }
+  }
+`
+
+const BlogPostTemplate = ({ data, pageContext, location }) => {
+  const post = data.poi.PointOfInterest[0]
+  const siteTitle = data.site.siteMetadata.title
+  const { previous, next } = pageContext
+
+  const [getRoute, { loading, data: routeData }] = useLazyQuery(GET_ROUTE_QUERY)
+
+  const [viewport, setViewport] = useState({
+    latitude: 40.7812,
+    longitude: -73.9665,
+    zoom: 13,
+  })
+
+  const onRouteSelected = e => {
+    // query the neo4j graphql API
+    // to find optimal route from the current POI to the selected
+    getRoute({ variables: { from: post.node_osm_id, to: e.target.value } })
+  }
+
+  let routeGeojson
+  if (routeData) {
+    routeGeojson = {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: routeData.PointOfInterest[0].routeToPOI.map((s, i) => {
+          return [s.longitude, s.latitude]
+        }),
+      },
+    }
+  }
+
+  return (
+    <Layout location={location} title={siteTitle}>
+      <SEO title={post.name} description={post.type} />
+      <article>
+        <header>
+          <h1
+            style={{
+              marginTop: rhythm(1),
+              marginBottom: 0,
+            }}
+          >
+            {post.name}
+          </h1>
+          <img src={post.photos[0]} alt={`Photo of ${post.name}`} />
+          Route to:
+          <select name="route" onChange={onRouteSelected}>
+            {data.allPOIs.PointOfInterest.map((p, i) => {
+              return (
+                <option key={i} value={p.node_osm_id}>
+                  {p.name}
+                </option>
+              )
+            })}
+          </select>
+          <MapGL
+            style={{ width: "100%", height: "600px" }}
+            mapStyle="mapbox://styles/mapbox/light-v9"
+            accessToken={process.env.GATSBY_MAPBOX_KEY}
+            latitude={viewport.latitude}
+            longitude={viewport.longitude}
+            zoom={viewport.zoom}
+            onViewportChange={setViewport}
+          >
+            <Marker
+              longitude={post.location.longitude}
+              latitude={post.location.latitude}
+            >
+              <svg
+                height={20}
+                viewBox="0 0 24 24"
+                style={{
+                  cursor: "pointer",
+                  fill: "green",
+                  stroke: "none",
+                }}
+              >
+                <path
+                  d="M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
+  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
+  C20.1,15.8,20.2,15.8,20.2,15.7z"
+                />
+              </svg>
+            </Marker>
+            {routeGeojson && (
+              <div>
+                <Source id="route" type="geojson" data={routeGeojson} />
+                <Layer
+                  id="route"
+                  type="line"
+                  source="route"
+                  layout={{
+                    "line-join": "round",
+                    "line-cap": "round",
+                  }}
+                  paint={{
+                    "line-color": "blue",
+                    "line-width": 8,
+                  }}
+                />
+                <Marker
+                  longitude={
+                    routeGeojson.geometry.coordinates[
+                      routeGeojson.geometry.coordinates.length - 1
+                    ][0]
+                  }
+                  latitude={
+                    routeGeojson.geometry.coordinates[
+                      routeGeojson.geometry.coordinates.length - 1
+                    ][1]
+                  }
+                >
+                  <svg
+                    height={20}
+                    viewBox="0 0 24 24"
+                    style={{
+                      cursor: "pointer",
+                      fill: "red",
+                      stroke: "none",
+                    }}
+                  >
+                    <path
+                      d="M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
+  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
+  C20.1,15.8,20.2,15.8,20.2,15.7z"
+                    />
+                  </svg>
+                </Marker>
+              </div>
+            )}
+          </MapGL>
+       ...
+
+    </Layout>
+  )
+}
+----
 
 == Resources
 
@@ -220,7 +406,7 @@ Another way to use Gatsby.js with Neo4j is by querying Neo4j at runtime instead 
 
 === Building A Travel Guide With Gatsby, Neo4j, & GraphQL
 
-This six part video tutorial goes through the steps of building a travel guide web application taking advantage of both static page rendering with Gatsby.js and client runtime datafetching.
+This six part video tutorial goes through the steps of building a travel guide web application taking advantage of both static page rendering with Gatsby.js and client runtime data fetching.
 
 ==== Part 1: Getting Started with Neo4j, Gatsby, and GraphQL
 
