@@ -11,7 +11,11 @@ Gatsby.js is a static site generator that uses React and GraphQL to create web p
 
 == What Is Gatsby.js?
 
+link:https://www.gatsbyjs.com/[Gatsby.js] is a JavaScript React-based framework for building web sites. Gatsby uses GraphQL as a data source for providing content from multiple sources during the build process to generate pre-rendered static web pages. A number of plugins are available for Gatsby that add additional features, functionality, and styling options. Gatsby is a popular tool that aligns with the Jamstack philosophy of pre-rendering web pages which are then served from a CDN and decoupling the services necessary to operate the site.
+
 == Why Use Gatsby With Neo4j?
+
+There are two fundamental approaches to using Gatsby with 
 
 == Architecture Overview
 
@@ -20,9 +24,11 @@ image::gatsby.png[]
 There are two ways to use GraphQL with Neo4j and Gatsby:
 
 1. As a source for static content during Gatsby's build process
-2. By querying the Neo4j GraphQL API from the client application.
+2. By querying the Neo4j GraphQL API from the client application - client runtime data fetching.
 
-== How To
+== How To Guide
+
+In this example, we will use Gatsby and Neo4j to build a travel guide web application. The Gatsby build process will use data from Neo4j (a point of interest dataset extracted from OpenStreetMap) to create a page for each point of interest. We will also demonstrate how to make use of client runtime data fetching with Gatsby and Neo4j for routing, using pathfinding graph algorithms in Neo4j to find a route between points of interest.
 
 === Libraries / Packages 
 
@@ -67,3 +73,44 @@ plugins: [
 // | icon:rss[] Blog | https://blog.grandstack.io
 |===
 
+== Videos & Tutorials
+
+=== Building A Travel Guide With Gatsby, Neo4j, & GraphQL
+
+This six part video tutorial goes through the steps of building a travel guide web application taking advantage of both static page rendering with Gatsby.js and client runtime datafetching.
+
+Part 1: Getting Started with Neo4j, Gatsby, and GraphQL
+
+++++
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/siPmZRTRki8' frameborder='0' allowfullscreen></iframe></div>
+++++
+
+Part 2: Using GraphQL With Gatsby.js
+
+++++
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/XCuknJAIX84' frameborder='0' allowfullscreen></iframe></div>
+++++
+
+Part 3: Images & Wikipedia Data With GraphQL
+
+++++
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/_DBVYEgr73E' frameborder='0' allowfullscreen></iframe></div>
+++++
+
+Part 4: Routing With Graph Algorithms
+
+++++
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/MvjhSDsai9U' frameborder='0' allowfullscreen></iframe></div>
+++++
+
+Part 5: DigitalOcean App Platform Deployment
+
+++++
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/SIDwj4mfbVQ' frameborder='0' allowfullscreen></iframe></div>
+++++
+
+Part 6: Maps & Routes With Mapbox GL JS
+
+++++
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style><div class='embed-container'><iframe src='https://www.youtube.com/embed/6eRzgpMOG9A' frameborder='0' allowfullscreen></iframe></div>
+++++
