@@ -11,7 +11,8 @@ Gatsby.js is a static site generator that uses React and GraphQL to create web p
 == What Is Gatsby.js?
 
 link:https://www.gatsbyjs.com/[Gatsby.js] is a JavaScript React-based framework for building web sites. Gatsby uses GraphQL as a data source for providing content from multiple sources during the build process to generate pre-rendered static web pages. A number of plugins are available for Gatsby that add additional features, functionality, and styling options. Gatsby is a popular tool that aligns with the Jamstack philosophy of pre-rendering web pages which are then served from a CDN and decoupling the services necessary to operate the site.
-a
+
+
 == Why Use Gatsby With Neo4j?
 
 Neo4j can be used as a content source for building pre-rendered web pages using Gatsby and also as a data source for client runtime data fetching, bringing the power of graphs to Gatsby powered React web sites. The example used in this guide is a travel guide web site populated with points of interest stored in Neo4j (pre-rendered content) combined with routing functionality powered by pathfinding graph algorithms (querying Neo4j at client runtime).
