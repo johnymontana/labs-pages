@@ -1,15 +1,13 @@
-= Using Neo4j With...
+= Neo4j Labs How To Guides
 :docs: https://grandstack.io/docs
 :!figure-caption:
 :author: William Lyon
 :tags: graphql, grandstack, applications, integrations, fullstack, extensions
 :neo4j-versions: 3.4, 3.5, 4.0, 4.1, 4.2
 
-This section provides an opinionated look at using Neo4j with various technologies.
+This section provides an opinionated look at using Neo4j with various technologies with the goal of demonstrating how graphs can be used in the context of common use cases and tooling.
 
 ## How To Use Neo4j With
 
-* React
-* Cloudflare Workers
 * Gatsby
 * GraalVM
