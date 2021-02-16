@@ -60,8 +60,9 @@ Others needed:
 |===
 | icon:github[] Connect to Neo4j from GraalVM | https://github.com/neo4j-labs/neo4j-graalvm
 | icon:github[] Extend Neo4j with GraalVM | https://github.com/neo4j-labs/neo4j-graalvm-polyglot
+| icon:book[] Blog post | https://medium.com/neo4j/language-buffet-using-neo4j-with-graalvm-abf824b504fd[Using Neo4j with GraalVM, part 1^]
+| icon:book[] Blog post | https://medium.com/neo4j/language-buffet-using-neo4j-with-graalvm-part-2-e5d2df990805[Using Neo4j with GraalVM, part 2^]
 | icon:book[] GraalVM Docs | https://www.graalvm.org/docs/introduction/
 | icon:book[] Neo4j docs | https://neo4j.com/docs/
-// | icon:book[] Article |
 | icon:comments[] Feedback, Questions, & Requests | https://community.neo4j.com/[Neo4j Online Community]
 |===
