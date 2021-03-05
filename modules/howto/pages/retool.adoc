@@ -1,0 +1,66 @@
+= Using Neo4j With Retool
+:docs: 
+:slug: retool
+:author: Jennifer Reif
+:category: labs
+:tags: visualization, application, dashboard, ui
+:neo4j-versions: 3.5, 4.0, 4.1, 4.2
+
+Retool is a UI-building application that can help users integrate data from various sources and build components for analyzing and displaying that data.
+
+== What Is Retool?
+
+It is a low-code tool for building interfaces and visual components for diverse data sources. Retool offers simple, yet configurable, drag-and-drop components that users can map showing results from various data sources and queries. From dashboards to analysis and more, Retool provides a quick and easy ramp for users to show their data in meaningful ways. It also has capabilities for adding query scheduling and triggers.
+
+Per Retool's https://docs.retool.com/docs/whats-retool[documentation^], the following are the core functionalities it provides:
+
+1. Connect your data sources - 20+ options, including traditional data stores and APIs like GraphQL.
+2. Build your queries and logic in SQL or Javascript.
+3. Connect your queries and logic to prebuilt components like tables, text inputs, and charts.
+4. Organize and connect your components into an application to anlayze the data or share with others.
+
+== Why Use Retool With Neo4j?
+
+There are a few different reasons why developers/analysts might choose Retool over other visualization or dashboarding options.
+
+1. Build a quick UI with the drag-and-drop components for a demo or presentation.
+2. Track internal progress or stats by pulling data from various sources into one, clean UI.
+3. Create a user interface for triggering or scheduling queries based on user input or analysis.
+4. https://docs.retool.com/docs/embedding-retool[Embed a Retool application^] in an iframe to share with the public.
+
+== Architecture Overview
+
+image::retool_graphql_neo4j.png[]
+
+To interact between the two technologies, we can use the common integration Retool and Neo4j both support - GraphQL. Retool's https://docs.retool.com/docs/graphql[GraphQL integration^] uses it as a data resource, and Neo4j's https://neo4j.com/labs/grandstack-graphql/[GraphQL integration^] uses it to expose graph data in an easily-consumable format.
+
+== How To
+
+=== Libraries / Packages
+
+There are 3 components needed for working using Retool with Neo4j.
+
+1. Neo4j - launch a local or hosted database instance with one of the following methods:
+a. Sandbox - temporary, hosted instance that is set up with a few clicks (free).
+b. Desktop - local instance created from the Neo4j Desktop application (requires download).
+c. Hosted - launch a remote instance with nearly any cloud provider (usually requires some cost).
+
+2. GraphQL - create a GraphQL layer to interact between the database and application. There are a couple of different ways to approach deploying a GraphQL integration on top of Neo4j, both of which are listed below.
+a. One-click deployment with Neo4j Sandbox - feature https://medium.com/neo4j/sandbox-spring-cleaning-38689661dece[blog post^] (see section on driver examples).
+b. Self-deployment on local machine or with most cloud service providers - walkthrough https://blog.grandstack.io/awwws-serverless-graphql-and-neo4j-d5536a32f1a0[blog post^].
+
+3. Retool - build your application in one of two ways.
+a. From the Retool https://retool.com/[website^] (can sign up for an account).
+b. With Retool https://docs.retool.com/docs/embedding-retool[embedded^] in another page or application.
+
+== Resources
+
+[cols="1,4"]
+|===
+| icon:github[] Neo4j Twitter Data | https://github.com/neo4j-graph-examples/twitter
+//| icon:book[] Blog post | blahblah[Using Neo4j with GraalVM, part 1^]
+//| icon:book[] Blog post | blahblah[Using Neo4j with GraalVM, part 2^]
+| icon:book[] Retool Docs | https://docs.retool.com/docs/
+| icon:play-circle[] Neo4j Sandbox | https://sandbox.neo4j.com/
+| icon:comments[] Feedback, Questions, & Requests | https://community.neo4j.com/[Neo4j Online Community^]
+|===
